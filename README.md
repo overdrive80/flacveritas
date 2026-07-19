@@ -115,6 +115,11 @@ Análisis con segunda opinión de auCDtect para TODOS y con resultados:
 python flacveritas.py "E:\Musica" --csv resultados.csv --aucdtect "C:\herramientas\aucdtect.exe" --aucdtect-todos
 ```
 
+Análisis con segunda opinión de auCDtect para SOLO MALOS y con resultados:
+```
+python flacveritas.py "E:\Musica" --csv resultados.csv --aucdtect "C:\herramientas\aucdtect.exe" --solo-malos
+```
+
 Comprobar un solo archivo con todo el detalle:
 
 ```

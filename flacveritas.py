@@ -200,8 +200,14 @@ def clasificar(f_inicio, f_fin, anchura, caida, fs):
             f"poca energía aguda (corte suave en {f_inicio/1000:.1f} kHz, caída de solo {caida:.0f} dB) "
             "— compatible con máster oscuro o fuente analógica con siseo; revisar a mano"
         )
+    if caida < 45:
+        return "LOSSLESS", pct, (
+            f"corte en {f_inicio/1000:.1f} kHz con transición intermedia ({anchura:.0f} Hz) "
+            f"pero sin silencio profundo debajo (caída de {caida:.0f} dB) — perfil de conversor, no de códec"
+        )
     return "SOSPECHOSO", pct, (
-        f"corte en {f_inicio/1000:.1f} kHz con transición intermedia ({anchura:.0f} Hz) — revisar espectrograma a mano"
+        f"corte en {f_inicio/1000:.1f} kHz con transición intermedia ({anchura:.0f} Hz) "
+        f"y caída profunda ({caida:.0f} dB) — revisar espectrograma a mano"
     )
 
 
@@ -304,6 +310,12 @@ def analizar_archivo(ruta, segundos, aucdtect=None, aucdtect_todos=False, grafic
                 detalle += f" | auCDtect: {clase} {prob}%"
                 if clase == "MPEG" and prob >= 70:
                     veredicto = "LOSSY"
+                elif (clase == "CDDA" and prob >= 90
+                      and veredicto == "SOSPECHOSO" and caida < 32):
+                    # ambos métodos coinciden: sin silencio de códec y sin
+                    # rastros de cuantización -> se cierra como lossless
+                    veredicto = "LOSSLESS"
+                    detalle += " — ambas metodologías descartan códec: se da por lossless"
 
         # espectrograma PNG para revisar a mano sin abrir Spek
         if grafico and (grafico_todos or veredicto in ("SOSPECHOSO", "LOSSY")):
