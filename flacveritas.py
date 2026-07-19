@@ -151,23 +151,40 @@ def clasificar(f_inicio, f_fin, anchura, caida, fs):
     nyquist = fs // 2
     pct = int(round(min(f_fin, nyquist) * 100.0 / nyquist))
 
-    muro = anchura < 700 and caida > 25       # transición estrecha y profunda
+    muro = anchura < 700                       # transición estrecha
 
     # corte pegado a Nyquist: lossless, salvo que sea un muro estrecho
     if f_inicio >= nyquist - 1500:
-        if muro:
+        if muro and caida >= 32:
             return "SOSPECHOSO", pct, (
                 f"muro estrecho ({anchura:.0f} Hz) en {f_inicio/1000:.1f} kHz pegado a Nyquist "
                 "— posible AAC/Vorbis de alta tasa; revisar espectrograma"
             )
+        if muro:
+            return "LOSSLESS", pct, (
+                f"corte abrupto en {f_inicio/1000:.1f} kHz pero con siseo/señal por encima "
+                f"(caída de solo {caida:.0f} dB) — filtro digital de la época, no códec"
+            )
         return "LOSSLESS", pct, "espectro completo hasta cerca de Nyquist"
     pendiente = anchura >= 1000                # caída ancha y progresiva
 
-    if muro and f_inicio < 20800:
+    if muro and caida >= 55 and f_inicio < 20800:
         firma = min(FIRMAS_LOSSY, key=lambda x: abs(x[0] - f_inicio))
         cercania = abs(firma[0] - f_inicio)
         pista = firma[1] if cercania < 800 else "códec lossy no identificado"
-        return "LOSSY", pct, f"muro en {f_inicio/1000:.1f} kHz ({anchura:.0f} Hz de transición) — compatible con {pista}"
+        return "LOSSY", pct, f"muro en {f_inicio/1000:.1f} kHz ({anchura:.0f} Hz de transición, caída {caida:.0f} dB) — compatible con {pista}"
+
+    if muro and caida >= 32:
+        return "SOSPECHOSO", pct, (
+            f"muro estrecho en {f_inicio/1000:.1f} kHz sin silencio profundo debajo ({caida:.0f} dB) "
+            "— posible lossy de alta tasa o filtro digital abrupto; revisar espectrograma"
+        )
+
+    if muro:
+        return "LOSSLESS", pct, (
+            f"corte abrupto en {f_inicio/1000:.1f} kHz pero con siseo/señal por encima "
+            f"(caída de solo {caida:.0f} dB) — un códec deja silencio digital, esto es un filtro de conversor"
+        )
 
     if pendiente:
         return "LOSSLESS", pct, (

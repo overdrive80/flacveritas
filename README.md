@@ -103,10 +103,16 @@ Ver solo lo problemático, con espectrogramas para revisar a mano:
 python flacveritas.py "E:\Musica" --solo-malos --grafico
 ```
 
-Análisis con segunda opinión de auCDtect:
+Análisis con segunda opinión de auCDtect para SOSPECHOSOS:
 
 ```
 python flacveritas.py "E:\Musica" --aucdtect "C:\herramientas\aucdtect.exe"
+```
+
+Análisis con segunda opinión de auCDtect para TODOS y con resultados:
+
+```
+python flacveritas.py "E:\Musica" --csv resultados.csv --aucdtect "C:\herramientas\aucdtect.exe" --aucdtect-todos
 ```
 
 Comprobar un solo archivo con todo el detalle:
