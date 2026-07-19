@@ -70,9 +70,9 @@ if "%SALIDA%"=="0" (
 ) else if "%SALIDA%"=="1" (
     echo hay archivos LOSSY o SOSPECHOSOS: revisa el CSV
 ) else (
-    echo el analisis termino con errores
+    echo el analisis no llego a completarse: revisa el mensaje de arriba
 )
-echo csv: %CSV%
+if exist "%CSV%" echo csv: %CSV%
 echo.
 pause
 endlocal

@@ -351,8 +351,8 @@ def principal():
 
     archivos = recolectar(args.entrada)
     if not archivos:
-        print("no se han encontrado archivos de audio")
-        sys.exit(1)
+        print("no se han encontrado archivos de audio en la ruta indicada")
+        sys.exit(2)
 
     usar_color = sys.stdout.isatty()
     if os.name == "nt":
